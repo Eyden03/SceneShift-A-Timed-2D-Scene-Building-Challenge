@@ -279,6 +279,30 @@ int objectiveTargets[OBJECTIVE_COUNT][TARGET_COUNT] =
 
 
 
+// Stores the randomized order of the 10 objectives
+int objectiveOrder[OBJECTIVE_COUNT];
+
+void shuffleObjectives()
+{
+    // Fill the array with objective indexes 0 to 9
+    for (int i = 0; i < OBJECTIVE_COUNT; i++)
+    {
+        objectiveOrder[i] = i;
+    }
+
+    // Shuffle the objective indexes
+    for (int i = OBJECTIVE_COUNT - 1; i > 0; i--)
+    {
+        // Choose a random index from 0 to i
+        int randomIndex = rand() % (i + 1);
+
+        // Swap the two values
+        int temp = objectiveOrder[i];
+        objectiveOrder[i] = objectiveOrder[randomIndex];
+        objectiveOrder[randomIndex] = temp;
+    }
+}
+
 // Objective sentences shown to the player
 const char* objectiveText[OBJECTIVE_COUNT] =
 {
@@ -304,31 +328,6 @@ const char* objectiveText[OBJECTIVE_COUNT] =
 };
 
 
-
-
-// Stores the randomized order of the 10 objectives
-int objectiveOrder[OBJECTIVE_COUNT];
-
-void shuffleObjectives()
-{
-    // Fill the array with objective indexes 0 to 9
-    for (int i = 0; i < OBJECTIVE_COUNT; i++)
-    {
-        objectiveOrder[i] = i;
-    }
-
-    // Shuffle the objective indexes
-    for (int i = OBJECTIVE_COUNT - 1; i > 0; i--)
-    {
-        // Choose a random index from 0 to i
-        int randomIndex = rand() % (i + 1);
-
-        // Swap the two values
-        int temp = objectiveOrder[i];
-        objectiveOrder[i] = objectiveOrder[randomIndex];
-        objectiveOrder[randomIndex] = temp;
-    }
-}
 
 
 
@@ -2561,8 +2560,8 @@ void drawObjectiveResult()
 
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    drawText(
-        -0.18f,
+    drawCenteredText(
+        0.0f,
         0.55f,
         "OBJECTIVE RESULT",
         GLUT_BITMAP_HELVETICA_18
@@ -2582,8 +2581,8 @@ void drawObjectiveResult()
 
     glColor3f(0.82f, 0.85f, 0.90f);
 
-    drawText(
-        -0.12f,
+    drawCenteredText(
+        0.0f,
         0.30f,
         objectiveResultText,
         GLUT_BITMAP_HELVETICA_12
@@ -2617,22 +2616,22 @@ void drawObjectiveResult()
     );
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    drawText(
-        -0.15f,
+    drawCenteredText(
+        0.0f,
         0.12f,
         objectiveScoreText,
         GLUT_BITMAP_HELVETICA_12
     );
 
-    drawText(
-        -0.15f,
+    drawCenteredText(
+        0.0f,
         0.02f,
         totalScoreText,
         GLUT_BITMAP_HELVETICA_12
     );
 
-    drawText(
-        -0.15f,
+    drawCenteredText(
+        0.0f,
         -0.08f,
         livesText,
         GLUT_BITMAP_HELVETICA_12
@@ -2643,17 +2642,19 @@ void drawObjectiveResult()
 
     if (objectiveScore == 5)
     {
-        drawText(
-            -0.08f,
+        glColor3f(0.5f, 0.5f, 1.0f);
+        drawCenteredText(
+            0.0f,
             -0.30f,
             "PERFECT",
             GLUT_BITMAP_HELVETICA_18
         );
-    }
+    }   
     else if (objectiveScore == 4)
     {
-        drawText(
-            -0.05f,
+        glColor3f(0.5f, 1.0f, 0.5f);
+        drawCenteredText(
+            0.0f,
             -0.30f,
             "PASS",
             GLUT_BITMAP_HELVETICA_18
@@ -2661,8 +2662,9 @@ void drawObjectiveResult()
     }
     else
     {
-        drawText(
-            -0.04f,
+        glColor3f(1.0f, 0.5f, 0.5f);
+        drawCenteredText(
+            0.0f,
             -0.30f,
             "FAIL",
             GLUT_BITMAP_HELVETICA_18
@@ -2673,15 +2675,15 @@ void drawObjectiveResult()
 
     glColor3f(0.82f, 0.85f, 0.90f);
 
-    drawText(
-        -0.08f,
+    drawCenteredText(
+        0.0f,
         -0.52f,
         "[ENTER] Continue",
         GLUT_BITMAP_HELVETICA_18
     );
 
-    drawText(
-        -0.08f,
+    drawCenteredText(
+        0.0f,
         -0.62f,
         "[ESC] Exit",
         GLUT_BITMAP_HELVETICA_18
@@ -2718,14 +2720,28 @@ void drawGameOver()
 
     // ==================== TITLE ====================
 
-    glColor3f(1.0f, 1.0f, 1.0f);
+    glColor3f(1.0f, 0.25f, 0.25f);
 
-    drawText(
-        -0.10f,
-        0.45f,
-        "GAME OVER",
-        GLUT_BITMAP_HELVETICA_18
-    );
+    glPushMatrix();
+
+    const char* gameOverTitle = "GAME OVER";
+    float titleWidth = 0.0f;
+
+    for (int i = 0; gameOverTitle[i] != '\0'; i++)
+    {
+        titleWidth += glutStrokeWidth(GLUT_STROKE_ROMAN, gameOverTitle[i]);
+    }
+
+    float titleScale = 0.0017f;
+    glTranslatef(-titleWidth * titleScale * 0.5f, 0.45f, 0.0f);
+    glScalef(titleScale, titleScale, 1.0f);
+
+    for (int i = 0; gameOverTitle[i] != '\0'; i++)
+    {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, gameOverTitle[i]);
+    }
+
+    glPopMatrix();
 
 
     // ==================== RESULTS ====================
@@ -2749,16 +2765,16 @@ void drawGameOver()
     // Play Again
     glColor3f(1.0f, 1.0f, 1.0f);
 
-    drawText(
-        -0.12f,
+    drawCenteredText(
+        0.0f,
         -0.30f,
         "[R] Play Again",
         GLUT_BITMAP_HELVETICA_18
     );
 
 
-    drawText(
-        -0.12f,
+    drawCenteredText(
+        0.0f,
         -0.40f,
         "[ESC] Exit",
         GLUT_BITMAP_HELVETICA_18
@@ -2768,15 +2784,15 @@ void drawGameOver()
 
     glColor3f(0.82f, 0.85f, 0.90f);
 
-    drawText(
-        -0.20f,
+    drawCenteredText(
+        0.0f,
         0.15f,
         completedText,
         GLUT_BITMAP_HELVETICA_12
     );
 
-    drawText(
-        -0.20f,
+    drawCenteredText(
+        0.0f,
         0.02f,
         totalScoreText,
         GLUT_BITMAP_HELVETICA_12
